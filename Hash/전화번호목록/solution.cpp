@@ -6,38 +6,32 @@
 
 using namespace std;
 
-bool compare(string a, string b){
-    return a.size()< b.size();
-}
 
 bool solution(vector<string> phone_book) {
-    for(int i = 0; i < phone_book.size(); i++){
-        cout<< i << ":"<< phone_book[i]<< endl;
-    }
     int book_size = phone_book.size();
-    printf("%d\n", book_size);
-    //sorting을 해서 넣어볼까?
+    //max, min은 검색하는 for문을 위해서 만듬
+    map<string, int> m;
+    int max = 0;
+    int min = phone_book[0].length();
+    
+    //해쉬맵에 넣어
     for(int i = 0; i < phone_book.size(); i++){
-        //길이가 짧은 애들을 앞으로
-        sort(phone_book.begin(), phone_book.end(), compare);
+        int len = phone_book[i].length();
+        if(len > max) max = len;
+        if(len < min) min = len;
+        m.insert(make_pair(phone_book[i], 1) );
     }
-    // printf("%d\n", phone_book.size());
-    for(int i = 0; i< book_size; i++){
-        for(int j = i + 1; j < book_size; j++){
-            int k;
-            for(k = 0; k < phone_book[i].length(); k++){
-                // printf("i = %d, j = %d, k = %d\n", i, j, k);
-                // cout<<phone_book[i]<<endl;
-                // cout<<phone_book[j]<<endl;
-                if(phone_book[i].at(k) != phone_book[j].at(k)){
-                    // cout << "pass"<< endl;
-                    break;
-                }
-            }
-            // cout<<phone_book[i].length()<<endl;
-            // cout<<k<<endl;
-            if(k == phone_book[i].length()) {
-                // cout << "return false" << endl;
+    
+    //글자수 만큼을 찾아
+    for(int i = min; i <= max; i++){
+        for(int j = 0; j < phone_book.size(); j++){
+            //string의 길이가 글자수보다 짧으면 패스
+            if(phone_book[j].length()<i) continue;
+            string x = phone_book[j].substr(0, i);
+            //substr이 string이랑 같으면 패스
+            if(x.compare(phone_book[j]) == 0) continue;
+            //해쉬맵에 존재하면 return false
+            if(m.find(x)->second == 1){
                 return false;
             }
         }
