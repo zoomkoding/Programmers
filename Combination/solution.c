@@ -28,24 +28,24 @@ long long dynamic(int n, int k){
 int main(void) {
   int n, k;
   long long recur_result, dynam_result;
-  float recur_time, dynam_time;
-  time_t start, end;
+  double recur_time, dynam_time;
+  clock_t start, end;
 
   printf("put n, k value : ");
   scanf("%d %d", &n, &k);
 
-  start = time(NULL); 
+  start = clock(); 
   recur_result = recursive(n, k);
-  end = time(NULL);
+  end = clock();
   recur_time = (double)(end - start);
   
-  start = time(NULL); 
+  start = clock(); 
   dynam_result = dynamic(n, k);
-  end = time(NULL);
+  end = clock();
   dynam_time = (double)(end - start);
 
-  printf("recursive time : %.4f result : %lli\n", recur_time, recur_result);
-  printf("dynamic time : %.4f result : %lli\n", dynam_time, dynam_result);
+  printf("recursive result : %lli, time : %.0fms\n", recur_result, recur_time);
+  printf("dynamic result   : %lli, time : %.0fms\n", dynam_result, dynam_time);
 
 
 
