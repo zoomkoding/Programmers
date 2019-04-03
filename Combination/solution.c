@@ -45,9 +45,4 @@ int main(void) {
   dynam_time = (double)(end - start);
 
   printf("recursive result : %lli, time : %.0fms\n", recur_result, recur_time);
-  printf("dynamic result   : %lli, time : %.0fms\n", dynam_result, dynam_time);
-
-
-
-  
-}
+  printf("dynamic result   : %lli, time : %.0fms\n", dynam_result, dynam_time); }
