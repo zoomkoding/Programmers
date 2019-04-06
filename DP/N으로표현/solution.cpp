@@ -1,105 +1,114 @@
 #include <string>
 #include <vector>
+#include <map>
 #include <iostream>
-#include <math.h>
 
 using namespace std;
 
 int solution(int N, int number) {
-    vector<int> v;
-    vector<int> c;
-    int start = 0;
-    int end = 2;
+    //2, 22, 222, 2222, 22222
+    long long Ns[7] = {
+        N,
+        N + N*10,
+        N + N*10 + N*100,
+        N + N*10 + N*100 + N*1000,
+        N + N*10 + N*100 + N*1000 + N*10000,
+        N + N*10 + N*100 + N*1000 + N*10000 + N*100000,
+        N + N*10 + N*100 + N*1000 + N*10000 + N*100000 + N*1000000
+        
+    };
+    
+    //map에 저장
+    map< long long, int > m;
+    vector<long long> v;
+    
+    //첫 원소만 넣어주고 시작하겠습니다.
+    m[N] = 1;
     v.push_back(N);
-    c.push_back(1);
-    v.push_back(N+10*N);
-    c.push_back(2);
     
-    for(int i = 0; i < 8; i++){
-        for(int j = start; j < end; j++){
-            //덧셈확인
-            if(v[j]+N == number){
-                cout << v[j] << "+" << N << endl; 
-                return c[j]+1;
-            } 
-            else {
-                v.push_back(v[j]+N);
-                c.push_back(c[j]+1);
-            }
-            //뺄셈확인
-            if(v[j]-N == number){
-                cout << v[j] << "-" << N << endl; 
-                return c[j]+1;
-            } 
+    for(int i = 2; i < 9; i ++){
+        int leng =  v.size();
+        for(int j = 0; j < leng; j++){
+            //꺼낸 원소와 계산에 쓸 숫자
+            long long num_out = v[j];
+            long long operand = Ns[i-m[num_out]-1];
+            long long result = 0;
+            //덧셈
+            result = num_out + operand;
+            
+            //number과 같으면 끝내
+            if(result == number) return i;
+            //안같으면
             else{
-                v.push_back(v[j]-N);
-                c.push_back(c[j]+1);
-            } 
-            //나눗셈확인
-            if(v[j]/N == number){
-                cout << v[j] << "/" << N << endl; 
-                return c[j]+1;
-            } 
-            else {
-                v.push_back(v[j]/N);
-                c.push_back(c[j]+1);
-
-            }
-            //곱셈확인
-            if(v[j]*N == number){
-                cout << v[j] << "*" << N << endl; 
-                return c[j]+1;
-            } 
-            else {
-                v.push_back(v[j]*N);
-                c.push_back(c[j]+1);
+                if(m[result] == 0){
+                    v.push_back(result);
+                    m[result] = i;
+                }
+                else{
+                    if(m[result] > i) m[result] = i;
+                }
             }
             
-            
-             int NN= N*10+N;
-            //덧셈확인
-            if(v[j]+NN == number){
-                cout << v[j] << "+" << NN << endl; 
-                return c[j]+2;
-            } 
-            else {
-                v.push_back(v[j]+NN);
-                c.push_back(c[j]+2);
-            }
-            
-            //뺄셈확인
-            if(v[j]-NN == number){
-                cout << v[j] << "-" << NN << endl; 
-                return c[j]+2;
-            } 
-            else {
-                v.push_back(v[j]-NN);
-                c.push_back(c[j]+2);
-            }
-            //나눗셈확인
-            if(v[j]/NN == number){
-                cout << v[j] << "/" << NN << endl; 
-                return c[j]+2;
-            } 
+            //뺄셈
+            result = num_out - operand;
+            //number과 같으면 끝내
+            if(result == number) return i;
+            //안같으면
             else{
-                v.push_back(v[j]/NN);
-                c.push_back(c[j]+2);
-            } 
-            //곱셈확인
-            if(v[j]*NN == number){
-                cout << v[j] << "*" << NN << endl; 
-                return c[j]+2;
-            } 
-            else {
-                v.push_back(v[j]*NN);
-                c.push_back(c[j]+2);
+                if(m[result] == 0){
+                    v.push_back(result);
+                    m[result] = i;
+                }
+                else{
+                    if(m[result] > i) m[result] = i;
+                }
             }
-            
-        }    
-        start+=pow(8, i);
-        end+=pow(8, i+1);
+            //나눗셈
+            result = num_out / operand;
+            //number과 같으면 끝내
+            if(result == number) return i;
+            //안같으면
+            else{
+                if(m[result] == 0){
+                    v.push_back(result);
+                    m[result] = i;
+                }
+                else{
+                    if(m[result] > i) m[result] = i;
+                }
+            }
+            //곱셈
+            result = num_out * operand;
+            //number과 같으면 끝내
+            if(result == number) return i;
+            //안같으면
+            else{
+                if(m[result] == 0){
+                    v.push_back(result);
+                    m[result] = i;
+                }
+                else{
+                    if(m[result] > i) m[result] = i;
+                }
+            }
+            //2->22, 22->22222
+            if(Ns[m[num_out]-1] == num_out){
+                result = Ns[i-1];
+                //number과 같으면 끝내
+                if(result == number) return i;
+                //안같으면
+                else{
+                    if(m[result] == 0){
+                        v.push_back(result);
+                        m[result] = i;
+                    }
+                    else{
+                        if(m[result] > i) m[result] = i;
+                    }
+                }
+            }
+        }
     }
-    
     
     return -1;
 }
