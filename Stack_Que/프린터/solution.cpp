@@ -1,20 +1,41 @@
 #include <string>
 #include <vector>
+#include <queue>
+#include <map>
 #include <iostream>
-#include <algorithm>
-
 using namespace std;
 
-bool myfunction(int a, int b){
-    string str_a = to_string(a);
-    string str_b = to_string(b);
-    return stoi(str_a+str_b) > stoi(str_b+str_a);
-}
-
-string solution(vector<int> numbers) {
-    string answer = "";
-    sort(numbers.begin(), numbers.end(), myfunction);
-    for(int i = 0; i < numbers.size(); i++)answer+=to_string(numbers[i]);
-    if(answer.compare(0,1,"0")==0)return "0";
-    return answer;
+int solution(vector<int> priorities, int location) {
+    queue<int> q;
+    map<int, int> m;
+    int max = 0;
+    int order = 0;
+    
+    for(int i = 0; i < priorities.size(); i++){
+        q.push(i);
+        if(m[priorities[i]] == m.end()->second) m[priorities[i]] = 1;
+        else m[priorities[i]] ++;
+        if(priorities[i] > max) max = priorities[i];
+    }
+    
+    while(!q.empty()){
+        int q_front = q.front();
+        int prior = priorities[q_front];
+        q.pop();
+        
+        if(prior == max){
+            order ++;
+            if(q_front == location) return order;
+            if(--m[prior] == 0){
+                for(int i = prior-1; i > 0; i--){
+                    if(m[i] != m.end()->second){
+                        max = i;
+                        break;
+                    }
+                }
+            }
+        }
+        else q.push(q_front);
+    }
+    return order;
 }
