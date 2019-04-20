@@ -307,7 +307,8 @@ int main(void) {
       end = clock();
       int time_solved = (int)end - start;
       if(time_solved>1000) time_solved = time_solved - time_solved%1000;
-      fprintf(f, "%-15.0f / %-15.0d", max_benefit, time_solved);
+      fprintf(f, "%-15.0f / %-15d", max_benefit, time_solved);
+      fflush(f);
     }
     fprintf(f, "\n");
   }  
