@@ -14,8 +14,8 @@ typedef struct item{
 void swap(Item* a, Item* b);
 void quick_sort(Item* array, int start, int end);
 float greedy(Item* array, int n, int w);
-float dp(Item* array, int n, int w);
-float bandb(Item* array, int n, int w);
+int dp(Item* array, int n, int w);
+int bandb(Item* array, int n, int w);
 
 
 
@@ -71,7 +71,7 @@ float greedy(Item* array, int n, int w){
   return benefit;
 }
 
-float dp(Item* array, int n, int W){
+int dp(Item* array, int n, int W){
   int ** B;
   B = (int**) malloc ((n+1) * sizeof(int*));
   for(int i = 0; i < n+1; i++) B[i] = (int*) malloc (W * sizeof(int));
@@ -185,9 +185,9 @@ int empty() {
 }
 
 
-float bandb(Item* array, int n, int w){
+int bandb(Item* array, int n, int w){
   heap_init();
-  float max_benefit = 0.0;
+  int max_benefit = 0;
   int weight = 0;
   //queue 사이즈 할당해주기
   Node root;

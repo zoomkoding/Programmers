@@ -13,9 +13,9 @@ typedef struct item{
 
 void swap(Item* a, Item* b);
 void quick_sort(Item* array, int start, int end);
-void greedy(Item* array, int n, int w);
-void dp(Item* array, int n, int w);
-void bandb(Item* array, int n, int w);
+float greedy(Item* array, int n, int w);
+int dp(Item* array, int n, int w);
+int bandb(Item* array, int n, int w);
 
 
 
@@ -52,7 +52,7 @@ void quick_sort(Item* array, int start, int end){
  
 }
 
-void greedy(Item* array, int n, int w){
+float greedy(Item* array, int n, int w){
   float benefit = 0;
   int left = w;
   for(int i = 0; i < n; i++){
@@ -68,10 +68,10 @@ void greedy(Item* array, int n, int w){
       if(left == 0) break;
     }
   }
-  printf("greedy benefit : %f\n", benefit);
+  return benefit;
 }
 
-void dp(Item* array, int n, int W){
+int dp(Item* array, int n, int W){
   int ** B;
   B = (int**) malloc ((n+1) * sizeof(int*));
   for(int i = 0; i < n+1; i++) B[i] = (int*) malloc (W * sizeof(int));
@@ -89,9 +89,7 @@ void dp(Item* array, int n, int W){
       else B[i][w] = B[i-1][w];
     }
   }
-  
-  printf("dp benefit : %d\n", B[n][W-1]);
-
+  return B[n][W-1];
 }
 
 typedef struct NodeStruct
@@ -103,52 +101,93 @@ typedef struct NodeStruct
 }Node;
 
 
+#define MAX_SIZE 10000
+ 
+Node heap[MAX_SIZE];
+int size;
 
-Node queue[4];
-int front, rear;
-int qsize = 4;
-
-void init_queue(void){
-    front = rear = 0;
+void heap_init() {
+    size = 0;
 }
 
-void clear_queue(void){
-    front = rear;
+void heap_swap(Node *a, Node *b) {
+    Node tmp = *a;
+    *a = *b;
+    *b = tmp;
 }
-void push(Node k){
-    // 큐가 꽉차있는지 확인
-    if ((rear + 1) % qsize == front){
-        printf("\n   Queue overflow.");
-        return;
+
+int push(Node value) {
+    if (size + 1 > MAX_SIZE) {
+        return 0;
     }
 
-    queue[rear] = k;
-    rear = ++rear % qsize;
-}
+    heap[size] = value;
 
-Node pop(void){
-    Node n;
-    if (front == rear){
-        n.benefit = -1;
-        return n;
+    int current = size;
+    int parent = (size - 1) / 2;
+
+    while (current > 0 && heap[current].bound > heap[parent].bound) {
+        heap_swap(&heap[current], &heap[parent]);
+        current = parent;
+        parent = (parent - 1) / 2;
     }
 
-    n = queue[front];
-    front = ++front % qsize;
-    return n;
+    size++;
+
+    return 1;
 }
 
-// typedef struct NodeStruct
-// {
-//     int weight;
-//     int benefit;
-//     int index;
-//     float bound;
-// }Node;
+Node pop() {
+    if (size <= 0) {
+      Node temp;
+      temp.benefit = -1;
+      return temp;
+    }
 
-void bandb(Item* array, int n, int w){
-  init_queue();
-  float max_benefit = 0.0;
+    Node ret = heap[0];
+    size--;
+
+    heap[0] = heap[size];
+    int current = 0;
+    int leftChild = current * 2 + 1;
+    int rightChild = current * 2 + 2;
+    int maxNode = current;
+
+    while (leftChild < size) {
+        if (heap[maxNode].bound < heap[leftChild].bound) {
+            maxNode = leftChild;
+        }
+        if (rightChild < size && heap[maxNode].bound < heap[rightChild].bound) {
+            maxNode = rightChild;
+        }
+
+        if (maxNode == current) {
+            break;
+        }
+        else {
+            heap_swap(&heap[current], &heap[maxNode]);
+            current = maxNode;
+            leftChild = current * 2 + 1;
+            rightChild = current * 2 + 2;
+        }
+    }
+    
+    return ret;
+}
+
+int empty() {
+    if (size == 0) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+
+int bandb(Item* array, int n, int w){
+  heap_init();
+  int max_benefit = 0;
   int weight = 0;
   //queue 사이즈 할당해주기
   Node root;
@@ -231,37 +270,54 @@ void bandb(Item* array, int n, int w){
   }
     
   //다돌았으면 결과 리턴해
-  printf("bnb benefit : %f\n", max_benefit);
+  return max_benefit;
 
 }
 
 int main(void) {
+  FILE *f;
+
+
+  f = fopen("output.txt", "w"); // 출력을 저장할 파일을 만들어서 열기
+
   srand(time(NULL)); 
+  clock_t start, end;
+  float max_benefit;
   int W;
   int n[9] = {10, 100, 500, 1000, 3000, 5000, 7000, 9000, 10000};
-  int samp_bi[4] = {40, 30, 50, 10};
-  int samp_wi[4] = {2, 5, 10, 5};
-  float samp_val[4] = {20, 6, 5, 2};
-  Item* items;
-  items = (Item*) malloc (n[0]*sizeof(Item));
-  W = 16;
-  for(int i = 0; i < n[0]; i++){
-    items[i].benefit = rand() % 300 + 1;  
-    items[i].weight = rand() % 100 + 1;
-    items[i].value = (float)items[i].benefit / items[i].weight;
-    printf("%d번째 benefit: %d, weight: %d, v/w: %f\n", i,items[i].benefit, items[i].weight, items[i].value);
+  // int samp_bi[4] = {40, 30, 50, 10};
+  // int samp_wi[4] = {2, 5, 10, 5};
+  // float samp_val[4] = {20, 6, 5, 2};
+  Item items[10000];
+  fprintf(f, "%-10s%-33s%-33s%-33s\n", "Time", "Greedy", "D.P.", "B. & B.");
+  for(int i = 0; i < 9; i++){
+    fprintf(f, "%-10d", n[i]);
+    W = n[i]*40;
+    for(int j = 0; j < n[i]; j++){
+      items[j].benefit = rand() % 300 + 1;  
+      items[j].weight = rand() % 100 + 1;
+      items[j].value = (float)items[j].benefit / items[j].weight;
+    }
+    quick_sort(items, 0, n[i]-1);
+    for(int j = 0; j < 3; j++){
+      start = clock(); 
+      if(j==0)max_benefit = greedy(items, n[i], W);
+      else if(j==1)max_benefit = dp(items, n[i], W);
+      else max_benefit = bandb(items, n[i], W);
+      end = clock();
+      int time_solved = (int)end - start;
+      if(time_solved>1000) time_solved = time_solved - time_solved%1000;
+      fprintf(f, "%-15.0f / %-15d", max_benefit, time_solved);
+      fflush(f);
+    }
+    fprintf(f, "\n");
   }  
-  // for(int i = 0; i < n[0]; i++){
-  //   items[i].benefit = samp_bi[i];
-  //   items[i].weight = samp_wi[i];
-  //   items[i].value = samp_val[i];
-  // }
-
-  quick_sort(items, 0, n[0]-1);
-  printf("\n\n");
-  for(int i = 0; i < n[0]; i++) printf("%d번째 benefit: %d, weight: %d, v/w: %f\n", i,items[i].benefit, items[i].weight, items[i].value);
-
-  // greedy(items, n[0], W);
-  dp(items, n[0], W);
-  bandb(items, n[0], W);
+  fclose(f);
 }
+
+
+// - 15분 넘어가면 다음 스텝으로 넘어가라
+// - output.txt
+// - 적어야하는 내용
+//     - 시간(milisec, 천단위에서 반올림)
+//     - 맥스
