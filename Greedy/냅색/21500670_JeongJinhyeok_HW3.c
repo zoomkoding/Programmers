@@ -1,3 +1,6 @@
+//My Program works for Greedy, DP and Branch and Bound solutions.
+//When the random numbers are created, the numbers are sorted before all algorithms for shortening the whole process time.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -19,6 +22,7 @@ void swap(Item* a, Item* b){
     *a=*b;
     *b=tmp;
 }
+clock_t start, end;
 
 void quick_sort(Item* array, int start, int end){
   if(start>=end) return;
@@ -66,12 +70,13 @@ float greedy(Item* array, int n, int w){
 int dp(Item* array, int n, int W){
   int ** B;
   B = (int**) malloc ((n+1) * sizeof(int*));
-  for(int i = 0; i < n+1; i++) B[i] = (int*) malloc (W * sizeof(int));
+  for(int i = 0; i < n+1; i++) B[i] = (int*) malloc ((W+1) * sizeof(int));
   
   for(int i = 0; i < W; i++)B[0][i] = 0;
   for(int i = 1; i < n + 1; i++){
+    if(clock() - start > CLOCKS_PER_SEC * 15 * 60) return -1;
     B[i][0] = 0;
-    for(int w = 1; w < W; w++){
+    for(int w = 1; w < W+1; w++){
       int _w = array[i-1].weight;
       int _b = array[i-1].benefit;
       if(_w <= w){
@@ -81,7 +86,7 @@ int dp(Item* array, int n, int W){
       else B[i][w] = B[i-1][w];
     }
   }
-  return B[n][W-1];
+  return B[n][W];
 }
 
 typedef struct NodeStruct
@@ -174,19 +179,20 @@ int bandb(Item* array, int n, int w){
   push(root);
   //q에서 꺼낸 원소가 -1이 아니라면 반복
   while(1){
+    if(clock() - start > CLOCKS_PER_SEC * 60 * 15) return -1;
     Node temp = pop();
     Node child[2];
     if(temp.benefit == -1) break;
     int index = temp.index + 1;
     if(temp.bound < max_benefit)continue;
-    if(temp.index == n-1)continue;
+    if(temp.index == n)continue;
     child[0].weight = temp.weight + array[index-1].weight;
     child[0].benefit = temp.benefit + array[index-1].benefit;
     child[1].weight = temp.weight;
     child[1].benefit = temp.benefit;
     //넣기로 하고 하나는 안넣기로해서 두번 작업해
     //꺼낸 원소의 weight과 w를 비교해서 넘으면 continue
-    for(int i = 0; i < 2; i++){
+    for(int i = 0; i < 9; i++){
       child[i].index = index;
       child[i].bound = child[i].benefit;
       if(w < child[i].weight)continue;
@@ -219,13 +225,12 @@ int main(void) {
   FILE *f;
   f = fopen("output.txt", "w"); // 출력을 저장할 파일을 만들어서 열기
   srand(time(NULL)); 
-  clock_t start, end;
   float max_benefit;
   int W;
   int n[9] = {10, 100, 500, 1000, 3000, 5000, 7000, 9000, 10000};
   Item items[10000];
-  fprintf(f, "%-10s%-33s%-33s%-33s\n", "Time", "Greedy", "D.P.", "B. & B.");
-  for(int i = 0; i < 9; i++){
+  fprintf(f, "21500670_JeongJinhyeok_HW3 Knapsack Problem Results(Time in mili-sec)\n\n%-10s%-33s%-33s%-33s\n", "Items", "Greedy", "D.P.", "B. & B.");
+  for(int i = 0; i < 2; i++){
     fprintf(f, "%-10d", n[i]);
     W = n[i]*40;
     for(int j = 0; j < n[i]; j++){
@@ -234,15 +239,19 @@ int main(void) {
       items[j].value = (float)items[j].benefit / items[j].weight;
     }
     quick_sort(items, 0, n[i]-1);
+  
     for(int j = 0; j < 3; j++){
       start = clock(); 
       if(j==0)max_benefit = greedy(items, n[i], W);
       else if(j==1)max_benefit = dp(items, n[i], W);
       else max_benefit = bandb(items, n[i], W);
       end = clock();
-      int time_solved = (int)end - start;
-      if(time_solved>1000) time_solved = time_solved - time_solved%1000;
-      fprintf(f, "%-15.0f / %-15d", max_benefit, time_solved);
+      if(max_benefit == -1) fprintf(f, "%-33s", "over 15min");
+      else{
+        double time_solved = (double)(end - start)/1000;
+        // if(time_solved>1000) time_solved = time_solved - time_solved%1000;
+        fprintf(f, "%-15.3f / %-15.3f", max_benefit, time_solved);
+      }
       fflush(f);
     }
     fprintf(f, "\n");

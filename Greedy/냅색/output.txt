@@ -1,0 +1,4 @@
+21500670_JeongJinhyeok_HW3 Knapsack Problem Results(Time in mili-sec)
+
+Items     Greedy                           D.P.                             B. & B.                          
+10        1422.557        / 0.005          1329.000        / 0.048          
