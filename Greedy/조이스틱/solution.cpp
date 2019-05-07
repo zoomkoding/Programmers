@@ -1,40 +1,35 @@
 #include <string>
 #include <vector>
-#include <iostream>
 
 using namespace std;
 
 int solution(string name) {
     int answer = 0;
-    bool* visited = new bool[name.length()];
-    for(int i = 0 ; i < name.length(); i++){
-        if(name.at(i) == 'A') visited[i] = true;
-        else visited[i] = false;
-        
-    }
     int i = 0;
+    int count = 0;
+    for(int i = 1; i < name.length(); i++){
+        if(name.at(i) == 'A') count++;
+    }
     while(1){
-        visited[i] = true;
         if(name.at(i) < 'N') answer+= name.at(i) - 'A';
         else answer+= 13 - (name.at(i) - 'N');
-        int d = 1;
+        name.at(i) = 'A';
+        count++;
+        if(count == name.length()) return answer;
+        int j = 1;
         while(1){
-            if(i+d == name.length()) return answer;
-            int up = i + d;
-            int down = (name.length() + (i - d)) % name.length();
-            if(!visited[up]) {
-                i = up;
-                answer += d;
+            if(name.at((i-j + name.length())%name.length()) != 'A') {
+                i = (i-j + name.length())%name.length();
+                answer += j;
                 break;
             }
-            else if(!visited[down]){
-                i = down;
-                answer += d;
+            if(name.at((i+j)%name.length())!= 'A'){
+                i = (i+j)%name.length();
+                answer += j;
                 break;
             }
-            else d ++;
+            j ++;
         }
-        
     }
-    return answer;
+    
 }

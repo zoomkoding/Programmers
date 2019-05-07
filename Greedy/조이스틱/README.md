@@ -30,55 +30,57 @@ ex) 완성해야 하는 이름이 세 글자면 AAA, 네 글자면 AAAA
 >* 모든 문자의 시작은 A이고 각 문자를 찾고 커서를 이동시키며 최소한으로 움직이는 방법을 구하는 문제이다.
 >* 사실상 다 문제 안되는데 A가 문제이다.
 >* JAN 같은 경우에는 A를 바꿀 필요가 없으므로 J를 바꾼후 N을 바꾸러 왼쪽으로 한번만 이동하면 끝이다.
->* 첫 글자를 만들고 왼쪽으로 갈지 오른쪽으로 갈지 정하는게 문제인듯 하다.
+>* 매번 글자를 바꾸고 글자에 좌우로 가장 가까운 거리에 있는 친구로 이동하는 것이 방법이다.
+
+## 방법은
+
+>* 방법은 그냥 간단하다.
+>* 알파벳 변경은 위 아래 중 짧게 걸리는 걸 선택하고
+>* 자기한테 가까운 A가 아닌 알파벳으로 이동해서 변경하도록 한다.
 
 
 
-## Greedy Algorithm 활용 코드 (복잡도: O(n^2))
+## Greedy Algorithm 활용 코드 (복잡도: O(n^2), 점수 : 90점)
 
     #include <string>
     #include <vector>
-    #include <iostream>
 
     using namespace std;
 
     int solution(string name) {
-    int answer = 0;
-    bool* visited = new bool[name.length()];
-    for(int i = 0 ; i < name.length(); i++){
-    if(name.at(i) == 'A') visited[i] = true;
-    else visited[i] = false;
+        int answer = 0;
+        int i = 0;
+        int count = 0;
+        for(int i = 1; i < name.length(); i++){
+            if(name.at(i) == 'A') count++;
+        }
+        while(1){
+            if(name.at(i) < 'N') answer+= name.at(i) - 'A';
+            else answer+= 13 - (name.at(i) - 'N');
+            name.at(i) = 'A';
+            count++;
+            if(count == name.length()) return answer;
+            int j = 1;
+            while(1){
+                if(name.at((i-j + name.length())%name.length()) != 'A') {
+                    i = (i-j + name.length())%name.length();
+                    answer += j;
+                    break;
+                } 
+                if(name.at((i+j)%name.length())!= 'A'){
+                    i = (i+j)%name.length();
+                    answer += j;
+                    break;
+                }
+                j ++;
+            }
+        }
 
-    }
-    int i = 0;
-    while(1){
-    visited[i] = true;
-    if(name.at(i) < 'N') answer+= name.at(i) - 'A';
-    else answer+= 13 - (name.at(i) - 'N');
-    int d = 1;
-    while(1){
-    if(i+d == name.length()) return answer;
-    int up = i + d;
-    int down = (name.length() + (i - d)) % name.length();
-    if(!visited[up]) {
-    i = up;
-    answer += d;
-    break;
-    }
-    else if(!visited[down]){
-    i = down;
-    answer += d;
-    break;
-    }
-    else d ++;
-    }
-
-    }
-    return answer;
     }
 
 ## 느낀점
 
->* 언제 그리디 알고리즘을 쓰는 것이 좋은지 아직 감이 잘 안온다.
->* 뭔가 직관적인 듯하면서도 아닌 것 같기도 한 애매함이 있다.
->* 유진이랑 잠깐 같이 봤는데 역시 유진이는 대단하다.
+>* 음.. 마지막에 하나가 계속 틀리게 나오는데 나중에 저거가 계속 틀리다고 나온다.
+>* 그리디로 풀 수 있는 방법이 맞나 의구심을 가지게 만든다 정말...
+>* 일단 그리디로 접근해서 문제는 맞게 푼거 같으니까 일단 이문제는 여기서 마무리하도록 하자.
+>* 뭔가 찝찝하다ㅠㅠㅠㅠ
