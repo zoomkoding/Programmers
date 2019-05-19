@@ -162,8 +162,8 @@ costs를 그림으로 표현하면 다음과 같으며, 이때 초록색 경로�
 
 
 ## 두 알고리즘 시간 차이
-<img width="400" src="https://raw.githubusercontent.com/zoomKoding/zoomKoding.github.io/source/assets/_posts/greedy-2.png">
-<img width="400" src="https://raw.githubusercontent.com/zoomKoding/zoomKoding.github.io/source/assets/_posts/greedy-3.png">
+<img width="200" src="https://raw.githubusercontent.com/zoomKoding/zoomKoding.github.io/source/assets/_posts/greedy-2.png"></br>
+<img width="200" src="https://raw.githubusercontent.com/zoomKoding/zoomKoding.github.io/source/assets/_posts/greedy-3.png">
 
 테스트 케이스가 작아서 시간 차이가 크게 안나보이지만 역시 시간이 줄었다 ㅎㅎ 흐뭇하다ㅎㅎㅎㅎ
 
