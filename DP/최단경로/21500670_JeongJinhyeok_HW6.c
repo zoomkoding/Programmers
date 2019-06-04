@@ -11,11 +11,15 @@
 // Busan	Daegu	Daejeon	Gangeung	Gwangju	Jeonju	Jinju	Pohang	Seoul  Wonju
 
 int arr[NUM][NUM];
+int result[3][NUM][NUM];
+float t[3];
 int d[NUM];
 int p[NUM];
 int ex[MAX_SIZE];
 int ey[MAX_SIZE];
 int ec = 0;
+char algo[3][100] = {"Bellman Ford", "Dijkstra", "Floyd"};
+char cities[NUM][100] = {"Busan", "Daegu", "Daejeon", "Gangeung", "Gwangju", "Jeonju", "Jinju", "Pohang", "Seoul", "Wonju"};
  
 int heap[MAX_SIZE];
 int size;
@@ -150,10 +154,8 @@ int bellman_ford(int src){
     if(d[ey[i]] > d[ex[i]] + arr[ex[i]][ey[i]]) return FALSE;
   }
 
-  for(int i = 0; i < NUM; i++){
-    printf("%3d ", d[i]);
-  }
-  printf("\n");
+  for(int i = 0; i < NUM; i++) result[0][src][i] = d[i];
+
   return TRUE;
 }
 
@@ -164,54 +166,63 @@ int dijkstra(int src){
   while(size != 0){
     int u = pop();
     for(int i = 0; i < NUM; i++) relax(u, i, arr[i][u]);
-    
   }
-
-  for(int i = 0; i < NUM; i++){
-    printf("%3d ", d[i]);
-  }
-  printf("\n");
-
+  for(int i = 0; i < NUM; i++) result[1][src][i] = d[i];
   return TRUE;
 }
 
 int floyd_warshall(){
-  int D[NUM][NUM][NUM];
-  for(int i = 0; i < NUM; i++){
-    for(int j = 0; j < NUM; j++){
-      for(int k = 0; k < NUM; k++)D[i][j][k] = 0;
-    }
-  }
-  for(int i = 0; i < NUM ; i++){
-    for(int j = 0; j < NUM; j++)D[0][i][j] = arr[i][j];
-  }
-  for(int k = 1; k < NUM; k++){
+    int D[NUM][NUM];
+for(int i = 0; i < NUM; i++){
+    for(int j = 0; j < NUM; j++)D[i][j] = arr[i][j];
+}
+
+for(int k = 0; k < NUM; k++){
     for(int i = 0; i < NUM; i++){
-      for(int j = 0; j < NUM; j++){
-        if(D[k-1][i][k] + D[k-1][k][j] < D[k-1][i][j]) D[k][i][j] = D[k-1][i][k] + D[k-1][k][j];
-        else D[k][i][j] = D[k-1][i][j];
-      }
+        for(int j = 0; j < NUM; j++){
+            if(D[i][k] + D[k][j] < D[i][j]) D[i][j] = D[i][k] + D[k][j];
+            else D[i][j] = D[i][j];
+        }
     }
-  }
-  for(int i = 0; i < NUM; i++){
-    for(int j = 0; j < NUM; j++){
-      printf("%3d ", D[NUM-1][i][j]);
-    }
-    printf("\n");
-  }
-  return TRUE;
+}
+for(int i = 0; i < NUM; i++){
+    for(int j = 0; j < NUM; j++) result[2][i][j] = D[i][j];
+} 
+
+return TRUE;
 }
 
 
+void print(){
+    for(int i = 0; i < 3; i++){
+        printf("\nIt took %.3f seconds to compute shortest path between cities with %s algorithm as follows.\n", t[i]/1000, algo[i]);
+        printf("%10s ", "");
+        for(int j = 0; j < NUM; j++)printf("%10s ", cities[j]);
+        printf("\n");
+        for(int j = 0; j < NUM; j++){
+            printf("%10s ", cities[j]);
+            for(int k = 0; k < NUM; k++)printf("%10d ", result[i][j][k]);
+            printf("\n");
+        }
+        printf("\n");
 
+    }
+    
+}
 
 int main(void) {
     readfile();
-    for(int i = 0; i < NUM; i++) bellman_ford(i);
-    printf("\n");
-    for(int i = 0; i < NUM; i++) dijkstra(i);
-    printf("\n");
-    floyd_warshall();
+    clock_t start, end;
+    for(int i = 0; i < 3; i++){
+        start = clock();
+        if(i == 0) for(int i = 0; i < NUM; i++) bellman_ford(i);
+        else if(i == 1) for(int i = 0; i < NUM; i++) dijkstra(i);
+        else floyd_warshall();
+        end = clock();
+        t[i] = (float)(end - start);
+    }
+    print();
+    
 
     return 0;
 }
